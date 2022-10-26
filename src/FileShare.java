@@ -18,7 +18,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
+import org.apache.commons.io.FilenameUtils;
 
 public class FileShare extends javax.swing.JFrame {
 
@@ -40,6 +40,8 @@ public class FileShare extends javax.swing.JFrame {
         tfSend = new javax.swing.JTextField();
         btnSend = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
+        btnLoc = new javax.swing.JButton();
+        lbLoc = new javax.swing.JLabel();
         btnReceive = new javax.swing.JToggleButton();
         btnExit = new javax.swing.JButton();
         btnInfo = new javax.swing.JButton();
@@ -91,7 +93,7 @@ public class FileShare extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btnChooseFile)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(sendFileName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel2)
@@ -103,20 +105,29 @@ public class FileShare extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(26, 26, 26)
+                .addGap(16, 16, 16)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnChooseFile)
                     .addComponent(sendFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGap(22, 22, 22)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(tfSend, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
                 .addComponent(btnSend)
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("Send File", jPanel1);
+
+        btnLoc.setText("Choose Download Location");
+        btnLoc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLocActionPerformed(evt);
+            }
+        });
+
+        lbLoc.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
 
         btnReceive.setText("Start Receiving");
         btnReceive.addActionListener(new java.awt.event.ActionListener() {
@@ -131,15 +142,26 @@ public class FileShare extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnReceive)
-                .addGap(0, 345, Short.MAX_VALUE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(btnReceive)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(btnLoc, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lbLoc, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(27, 27, 27)
+                .addGap(16, 16, 16)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnLoc)
+                    .addComponent(lbLoc, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
                 .addComponent(btnReceive)
-                .addContainerGap(98, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("Receive File", jPanel2);
@@ -228,26 +250,34 @@ public class FileShare extends javax.swing.JFrame {
     }//GEN-LAST:event_btnChkIPActionPerformed
 
     private void btnReceiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReceiveActionPerformed
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                downloadFile();
+        if (btnReceive.isSelected() == true && (downloadLoc.isBlank() || downloadLoc.isEmpty())) {
+            btnReceive.setSelected(false);
+            btnReceive.setText("Start Receiving");
+            JOptionPane.showMessageDialog(this, "No download location chosen. Please choose one and start again.");
+        } else {
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    downloadFile();
+                }
+            };
+            if (btnReceive.isSelected() == true) {
+                try {
+                    btnReceive.setText("Stop Receiving");
+                    serverSocket = new ServerSocket(1050);
+                    t.start();
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(this, e.toString());
+                }
             }
-        };
-        if (btnReceive.isSelected() == true) {
-            try {
-                serverSocket = new ServerSocket(1050);
-                t.start();
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(this, e.toString());
-            }
-        }
-        else {
-            try {
-                t.interrupt();
-                serverSocket.close();
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(this, e.toString());
+            else {
+                try {
+                    t.interrupt();
+                    serverSocket.close();
+                    btnReceive.setText("Start Receiving");
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(this, e.toString());
+                }
             }
         }
     }//GEN-LAST:event_btnReceiveActionPerformed
@@ -265,13 +295,19 @@ public class FileShare extends javax.swing.JFrame {
                     if (fileContentLength > 0) {
                         byte[] fileContentBytes = new byte[fileContentLength];
                         dataInputStream.readFully(fileContentBytes, 0, fileContentLength);
-                        Files.createDirectories(Paths.get("FileShare-Downloads/"));
-                        File fileToDownload = new File("FileShare-Downloads/" + fileName);
+                        Files.createDirectories(Paths.get(downloadLoc));
+                        boolean check = new File(downloadLoc + "/" + fileName).exists();
+                        while (check == true) {
+                            String fileExtension = FilenameUtils.getExtension(fileName);
+                            fileName = fileName.replace(fileExtension, "_." + fileExtension);
+                            check = new File(downloadLoc + "/" + fileName).exists();
+                        }
+                        File fileToDownload = new File(downloadLoc + "/" + fileName);
                         try {
                             try (FileOutputStream fileOutputStream = new FileOutputStream(fileToDownload)) {
                                 fileOutputStream.write(fileContentBytes);
                             }
-                            JOptionPane.showMessageDialog(this, fileName + " received and stored in FileShare-Downloads folder.");
+                            JOptionPane.showMessageDialog(this, fileName + " downloaded and stored in " + downloadLoc + " folder.");
                         } catch (IOException e) {
                             JOptionPane.showMessageDialog(this, e.toString());
                         }
@@ -280,7 +316,8 @@ public class FileShare extends javax.swing.JFrame {
                 socket.close();
             }
             serverSocket.close();
-            btnReceive.setSelected(false);            
+            btnReceive.setSelected(false);
+            btnReceive.setText("Start Receiving");
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Server stopped.\n");
         }
@@ -318,6 +355,17 @@ public class FileShare extends javax.swing.JFrame {
         ep.setBackground(label.getBackground());
         JOptionPane.showMessageDialog(this, ep);
     }//GEN-LAST:event_btnInfoActionPerformed
+
+    private void btnLocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLocActionPerformed
+        JFileChooser locChooser = new JFileChooser();
+        locChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        locChooser.setDialogTitle("Choose the download location");
+        if (locChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            downloadLoc = locChooser.getSelectedFile().toString();
+            System.out.println(downloadLoc);
+            lbLoc.setText(downloadLoc);
+        }
+    }//GEN-LAST:event_btnLocActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -357,18 +405,21 @@ public class FileShare extends javax.swing.JFrame {
     }
 
     private File fileToSend;
+    private String downloadLoc = "";
     private ServerSocket serverSocket;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChkIP;
     private javax.swing.JButton btnChooseFile;
     private javax.swing.JButton btnExit;
     private javax.swing.JButton btnInfo;
+    private javax.swing.JButton btnLoc;
     private javax.swing.JToggleButton btnReceive;
     private javax.swing.JButton btnSend;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel lbLoc;
     private javax.swing.JLabel lbTitle;
     private javax.swing.JLabel sendFileName;
     private javax.swing.JTextField tfSend;
