@@ -362,7 +362,6 @@ public class FileShare extends javax.swing.JFrame {
         locChooser.setDialogTitle("Choose the download location");
         if (locChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             downloadLoc = locChooser.getSelectedFile().toString();
-            System.out.println(downloadLoc);
             lbLoc.setText(downloadLoc);
         }
     }//GEN-LAST:event_btnLocActionPerformed
@@ -393,7 +392,6 @@ public class FileShare extends javax.swing.JFrame {
         try {
             UIManager.setLookAndFeel(new FlatIntelliJLaf());
         } catch (UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
         }
 
         /* Create and display the form */
