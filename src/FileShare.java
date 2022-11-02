@@ -299,7 +299,7 @@ public class FileShare extends javax.swing.JFrame {
                         boolean check = new File(downloadLoc + "/" + fileName).exists();
                         while (check == true) {
                             String fileExtension = FilenameUtils.getExtension(fileName);
-                            fileName = fileName.replace(fileExtension, "_." + fileExtension);
+                            fileName = fileName.replace("." + fileExtension, "_." + fileExtension);
                             check = new File(downloadLoc + "/" + fileName).exists();
                         }
                         File fileToDownload = new File(downloadLoc + "/" + fileName);
