@@ -361,6 +361,7 @@ public class FileShare extends javax.swing.JFrame {
                             try (FileOutputStream fileOutputStream = new FileOutputStream(fileToDownload)) {
                                 fileOutputStream.write(fileContentBytes);
                             }
+                            lbReceiveStatus.setText("");
                             JOptionPane.showMessageDialog(this, fileName + " downloaded and stored in " + downloadLoc + " folder.", "Success", 1);
                         } catch (IOException e) {
                             JOptionPane.showMessageDialog(this, e.toString(), "Error", 0);
