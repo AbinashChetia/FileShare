@@ -40,10 +40,12 @@ public class FileShare extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         tfSend = new javax.swing.JTextField();
         btnSend = new javax.swing.JButton();
+        lbSendStatus = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         btnLoc = new javax.swing.JButton();
         lbLoc = new javax.swing.JLabel();
         btnReceive = new javax.swing.JToggleButton();
+        lbReceiveStatus = new javax.swing.JLabel();
         btnExit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -121,6 +123,8 @@ public class FileShare extends javax.swing.JFrame {
             }
         });
 
+        lbSendStatus.setFont(new java.awt.Font("Liberation Sans", 0, 18)); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -134,7 +138,8 @@ public class FileShare extends javax.swing.JFrame {
                         .addComponent(tfSend, javax.swing.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btnSend)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lbSendStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(2, 2, 2)
                         .addComponent(btnChooseFile)
@@ -154,9 +159,13 @@ public class FileShare extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addComponent(tfSend, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                .addComponent(btnSend)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSend)
+                    .addComponent(lbSendStatus))
                 .addContainerGap())
         );
+
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnSend, lbSendStatus});
 
         jTabbedPane1.addTab("SEND", jPanel1);
 
@@ -180,6 +189,8 @@ public class FileShare extends javax.swing.JFrame {
             }
         });
 
+        lbReceiveStatus.setFont(new java.awt.Font("Liberation Sans", 0, 18)); // NOI18N
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -191,10 +202,12 @@ public class FileShare extends javax.swing.JFrame {
                         .addGap(6, 6, 6)
                         .addComponent(lbLoc, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnLoc)
-                            .addComponent(btnReceive))
-                        .addGap(0, 116, Short.MAX_VALUE)))
+                        .addComponent(btnLoc)
+                        .addGap(0, 116, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(btnReceive)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lbReceiveStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -205,9 +218,13 @@ public class FileShare extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lbLoc, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
-                .addComponent(btnReceive)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnReceive)
+                    .addComponent(lbReceiveStatus))
                 .addContainerGap())
         );
+
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnReceive, lbReceiveStatus});
 
         jTabbedPane1.addTab("RECEIVE", jPanel2);
 
@@ -227,10 +244,13 @@ public class FileShare extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
+        lbSendStatus.setText("Sending...");
         if (fileToSend == null) {
+            lbSendStatus.setText("");
             JOptionPane.showMessageDialog(this, "Error: No file is selected.", "Error", 0);
         }
         else if (tfSend.getText().equals("")) {
+            lbSendStatus.setText("");
             JOptionPane.showMessageDialog(this, "Receiver's IP is not entered.", "Error", 0);
         }
         else {
@@ -248,9 +268,10 @@ public class FileShare extends javax.swing.JFrame {
                 dataOutputStream.write(fileNameBytes);
                 dataOutputStream.writeInt(fileContentBytes.length);
                 dataOutputStream.write(fileContentBytes);
-                
+                lbSendStatus.setText("");
                 JOptionPane.showMessageDialog(this, fileToSend.getName() + " sent to " + tfSend.getText() + ".", "Success", 1);
             } catch (HeadlessException | IOException e) {
+                lbSendStatus.setText("");
                 JOptionPane.showMessageDialog(this, e.toString());
             }
         }
@@ -302,8 +323,7 @@ public class FileShare extends javax.swing.JFrame {
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(this, e.toString(), "Error", 0);
                 }
-            }
-            else {
+            } else {
                 try {
                     t.interrupt();
                     serverSocket.close();
@@ -318,6 +338,7 @@ public class FileShare extends javax.swing.JFrame {
     private void downloadFile() {
         try {
             try (Socket socket = serverSocket.accept()) {
+                lbReceiveStatus.setText("Receiving...");
                 DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
                 int fileNameLength = dataInputStream.readInt();
                 if (fileNameLength > 0) {
@@ -347,11 +368,13 @@ public class FileShare extends javax.swing.JFrame {
                     }
                 }
                 socket.close();
+                lbReceiveStatus.setText("");
             }
             serverSocket.close();
             btnReceive.setSelected(false);
             btnReceive.setText("Start Receiving");
         } catch (IOException e) {
+            lbReceiveStatus.setText("");
             JOptionPane.showMessageDialog(this, "Server stopped.\n", "Message", 2);
         }
     }
@@ -455,6 +478,8 @@ public class FileShare extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lbLoc;
+    private javax.swing.JLabel lbReceiveStatus;
+    private javax.swing.JLabel lbSendStatus;
     private javax.swing.JLabel lbTitle;
     private javax.swing.JLabel sendFileName;
     private javax.swing.JTextField tfSend;
